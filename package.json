@@ -1,14 +1,38 @@
 {
-  "name": "graph-viz",
-  "version": "1.0.0",
-  "description": "Graph Visualization Web App",
-  "main": "server/index.js",
+  "name": "haokee-graph",
+  "version": "1.1.0",
+  "description": "Haokee Graph Visualization Web App",
+  "main": "electron/main.js",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "start": "node server/index.js",
-    "server:bg": "node scripts/start-server.js"
+    "server:bg": "node scripts/start-server.js",
+    "electron:dev": "npm run build && electron .",
+    "electron:build": "npm run build && electron-builder"
+  },
+  "build": {
+    "appId": "com.haokee.graph",
+    "productName": "渴鹅图论",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "server/**/*",
+      "electron/**/*",
+      "package.json",
+      "resources/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "resources/icon256x256.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -28,7 +52,11 @@
     "@types/react-dom": "^18.2.15",
     "@types/uuid": "^9.0.7",
     "@vitejs/plugin-react": "^4.2.0",
+    "cross-env": "^10.1.0",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.4.0",
     "typescript": "^5.2.2",
-    "vite": "^5.0.0"
+    "vite": "^5.0.0",
+    "wait-on": "^9.0.3"
   }
 }

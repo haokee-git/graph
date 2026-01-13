@@ -11,7 +11,7 @@ export class PhysicsEngine {
   GRAVITY = 0; // Disable gravity for planar simulation
   
   // Dynamic Length Constants
-  LENGTH_ADJUST_RATE = 1.0; // How fast it shrinks/grows per frame
+  LENGTH_ADJUST_RATE = 0.15; // 按差值比例调整（每帧调整差值的 15%）
 
   constructor() {
     this.nodes = new Map();
@@ -135,15 +135,11 @@ export class PhysicsEngine {
 
     // 2. Edge Springs (Straight Line Simulation)
     this.edges.forEach(edge => {
-      // Dynamic Length Adjustment
-      // Slowly adjust restLength towards idealLength
-      // Scale adjust rate by dt for consistency (though it's length not force)
-      const adjust = this.LENGTH_ADJUST_RATE * dt; 
-      if (edge.restLength > edge.idealLength) {
-        edge.restLength = Math.max(edge.idealLength, edge.restLength - adjust);
-      } else if (edge.restLength < edge.idealLength) {
-        edge.restLength = Math.min(edge.idealLength, edge.restLength + adjust);
-      }
+      // Dynamic Length Adjustment - 按差值比例快速调整
+      // 距离越远收缩越快，接近目标时逐渐变慢，形成平滑过渡
+      const diff = edge.idealLength - edge.restLength;
+      const adjust = diff * this.LENGTH_ADJUST_RATE; // 按差值的比例调整
+      edge.restLength += adjust;
 
       const source = this.nodes.get(edge.sourceId);
       const target = this.nodes.get(edge.targetId);

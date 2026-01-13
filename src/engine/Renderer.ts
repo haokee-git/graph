@@ -51,11 +51,18 @@ export class Renderer {
       const target = this.engine.nodes.get(edge.targetId);
       if (!source || !target) return;
 
+      // 判断该边是否连接到悬停的节点
+      const isConnectedToHovered = Boolean(
+        this.hoveredNodeId && 
+        (edge.sourceId === this.hoveredNodeId || edge.targetId === this.hoveredNodeId)
+      );
+
       this.ctx.beginPath();
       this.ctx.moveTo(source.x, source.y);
       this.ctx.lineTo(target.x, target.y);
       
-      this.ctx.strokeStyle = '#666';
+      // 如果连接到悬停节点，使用偏灰的蓝色；否则使用默认灰色
+      this.ctx.strokeStyle = isConnectedToHovered ? '#6FA8DC' : '#666';
       this.ctx.lineWidth = 2;
       this.ctx.stroke();
 
@@ -71,7 +78,7 @@ export class Renderer {
         const arrowX = target.x - Math.cos(angle) * offset;
         const arrowY = target.y - Math.sin(angle) * offset;
 
-        this.drawArrow(arrowX, arrowY, angle);
+        this.drawArrow(arrowX, arrowY, angle, isConnectedToHovered);
       }
 
       // Draw Label (at middle of rope)
@@ -144,8 +151,13 @@ export class Renderer {
     
     this.ctx.stroke();
 
-    this.ctx.font = '14px BodyFont';
-    this.ctx.fillStyle = '#000';
+    // 节点编号 - 悬停时加粗且变蓝色
+    this.ctx.font = this.hoveredNodeId === node.id 
+      ? 'bold 14px BodyFont'  // 悬停时加粗
+      : '14px BodyFont';       // 正常
+    this.ctx.fillStyle = this.hoveredNodeId === node.id 
+      ? '#2196f3'              // 悬停时蓝色
+      : '#000';                // 正常黑色
     this.ctx.textAlign = 'center';
     this.ctx.textBaseline = 'middle';
     this.ctx.fillText(node.label, node.x, node.y);
@@ -163,14 +175,14 @@ export class Renderer {
     this.ctx.closePath();
   }
 
-  drawArrow(x: number, y: number, angle: number) {
+  drawArrow(x: number, y: number, angle: number, isHighlighted: boolean = false) {
     const headLen = 10;
     this.ctx.beginPath();
     this.ctx.moveTo(x, y);
     this.ctx.lineTo(x - headLen * Math.cos(angle - Math.PI / 6), y - headLen * Math.sin(angle - Math.PI / 6));
     this.ctx.moveTo(x, y);
     this.ctx.lineTo(x - headLen * Math.cos(angle + Math.PI / 6), y - headLen * Math.sin(angle + Math.PI / 6));
-    this.ctx.strokeStyle = '#666';
+    this.ctx.strokeStyle = isHighlighted ? '#6FA8DC' : '#666'; // 高亮时使用偏灰的蓝色
     this.ctx.lineWidth = 2;
     this.ctx.stroke();
   }

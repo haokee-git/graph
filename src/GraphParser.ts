@@ -4,6 +4,7 @@ import { Edge } from './engine/types';
 export interface ParserError {
   line: number;
   message: string;
+  severity: 'error' | 'warning'; // 错误级别：error（红色）或 warning（橙色）
 }
 
 export interface ParserResult {
@@ -33,17 +34,19 @@ export class GraphParser {
       const targetLabel = parts[1];
       const edgeLabel = parts.length > 2 ? parts[2] : '';
 
-      // Validate labels length > 3
+      // Validate labels length > 3 - 改为警告而不是错误
       if (sourceLabel.length > 3) {
         errors.push({
           line: index + 1,
-          message: `节点编号 "${sourceLabel}" 超过3个字符`
+          message: `节点编号 "${sourceLabel}" 超过3个字符`,
+          severity: 'warning' // 警告级别（橙色）
         });
       }
       if (targetLabel.length > 3) {
         errors.push({
           line: index + 1,
-          message: `节点编号 "${targetLabel}" 超过3个字符`
+          message: `节点编号 "${targetLabel}" 超过3个字符`,
+          severity: 'warning' // 警告级别（橙色）
         });
       }
 
